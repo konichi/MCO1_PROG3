@@ -10,15 +10,13 @@ public class WriteToFile {
             if(!file.exists()) {
                 file.createNewFile();
             }
-
             FileWriter fw = new FileWriter(file.getName(),true);
             BufferedWriter bw = new BufferedWriter(fw);
-
             switch (type) {
                 case 1:     //add patient
                     bw.write(patient.getPatientCodeIdentifier() + ";");
-                    bw.write(patient.getFirstName() + ";");
                     bw.write(patient.getLastName() + ";");
+                    bw.write(patient.getFirstName() + ";");
                     bw.write(patient.getMiddleName() + ";");
                     bw.write(patient.getBirthday() + ";");
                     bw.write(patient.getGender() + ";");
@@ -34,7 +32,6 @@ public class WriteToFile {
 
                     break;
             }
-
             bw.close();
             error = 0;
         } catch(IOException e){

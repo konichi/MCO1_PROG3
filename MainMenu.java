@@ -9,7 +9,6 @@ public class MainMenu {
         System.out.println("[1] Manage Patient Records");
         System.out.println("[2] Manage Services");
         System.out.println("[3] Manage Laboratory Results");
-        System.out.println("[4] Exit");
         System.out.print("\nSelect a transaction: ");
         input = scanner.next();
         System.out.println();
@@ -18,7 +17,6 @@ public class MainMenu {
             case "1" -> managePatientRecords();
             case "2" -> manageServices();
             case "3" -> manageLaboratoryRequest();
-//            default -> System.exit(0);
         }
     }
 

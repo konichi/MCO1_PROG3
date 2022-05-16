@@ -1,14 +1,20 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class ManagePatientRecords {
-    ArrayList<Patient> patients = new ArrayList<Patient>();
+    ArrayList<Patient> patients = new ArrayList<>();
+
+    //adding patients
     WriteToFile wtf = new WriteToFile();
     MainMenu mm = new MainMenu();
-    private char savePatientRecord;
+    private String savePatientRecord;
+    private int patientCounter = 0;
+    String[] tempUID = new String[12];
+
+    //deleting records
+    String reason;
+    String newLine;
+
+    //general
     private int error = 0;
 
     public void managePatientRecords(){
@@ -35,73 +41,86 @@ public class ManagePatientRecords {
     }
 
     public String generateUID() {
-        String A = null;
-        String B = null;
-        String C = null;
-        String D = null;
-        String E = null;
-        String temp;
-        char tempD;
-        int tempInt;
-        int year = Calendar.getInstance().get(Calendar.YEAR);
-        int month = Calendar.getInstance().get(Calendar.MONTH);
         int day = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
-        for(int i=0; i<11; i++) {
-            switch (i) {
-                case 0:
-                    A = "P";
-                    break;
-                case 1:
-                    B = String.valueOf(year);
-                    break;
-                case 5:
-                    if(month<=9)
-                        C = "0"+ month;
-                    else
-                        C = String.valueOf(month);
-                    break;
-                case 7:
-                    if(day==1) {                        //resets DDDEE every start of the month
-                        D = "AAA";
-                        E = "00";
-                    } else if(E.charAt(0)!='9' && E.charAt(1)!='9') {     //increments EE
-                        tempInt = Integer.valueOf(E);
-                        tempInt++;
-                        if(tempInt<=9)
-                            E = "0" + tempInt;
-                        else
-                            E = String.valueOf(tempInt);
-                    } else {
-                        E = "00";
-                        if (D.charAt(2) != 'Z') {
-                            tempD = D.charAt(2);
-                            tempD++;
-                            temp = D.substring(0, 2) + tempD + D.substring(3);
-                            D = temp;
-                        } else if (D.charAt(1) != 'Z') {
-                            tempD = D.charAt(1);
-                            tempD++;
-                            temp = D.substring(0, 1) + tempD + D.substring(2);
-                            D = temp;
-                        } else if (D.charAt(0) != 'Z') {
-                            tempD = D.charAt(0);
-                            tempD++;
-                            temp = tempD + D.substring(1);
-                            D = temp;
-                        } else
-                            System.out.println("Number of Patient Records Exceeded!");
-                    }
+
+        tempUID[0] = "P";
+
+        int B = Calendar.getInstance().get(Calendar.YEAR);
+        String temp = String.valueOf(B);
+        char[] cTemp = new char[temp.length()];
+        for (int i = 0; i < temp.length(); i++)
+            cTemp[i] = temp.charAt(i);
+        for (int i = 0; i < temp.length(); i++)
+            tempUID[i + 1] = String.valueOf(cTemp[i]);
+
+        int C = Calendar.getInstance().get(Calendar.MONTH)+1;
+        temp = String.valueOf(C);
+        for (int i = 0; i < temp.length(); i++)
+            cTemp[i] = temp.charAt(i);
+        for (int i = 0; i < temp.length(); i++) {
+            if (C > 9)
+                tempUID[i + 5] = String.valueOf(cTemp[i]);
+            else {
+                tempUID[5] = "0";
+                tempUID[6] = String.valueOf(cTemp[i]);
             }
         }
-        String patientCodeIdentifier = A + B + C + D + E;
+
+        if (patientCounter == 0) {               // if it's the first entry
+            for (int i = 0; i < 3; i++)
+                tempUID[i + 7] = "A";         //D
+            for (int i = 0; i < 2; i++)
+                tempUID[i + 10] = "0";        //E
+        } else if (day == 1) {                // if it's the first day
+            patientCounter = 0;
+            for (int i = 0; i < 3; i++)
+                tempUID[i + 7] = "A";         //D
+            for (int i = 0; i < 2; i++)
+                tempUID[i + 10] = "0";        //E
+        } else {
+            if (patientCounter != 99) {
+                if(patientCounter<9) {
+                    int iTemp = patientCounter;
+                    tempUID[11] = String.valueOf(iTemp);
+                }
+                else {
+                    int iTemp = patientCounter;
+                    String sTemp = Integer.toString(iTemp);
+                    tempUID[10] = String.valueOf(sTemp.charAt(0));
+                    tempUID[11] = String.valueOf(sTemp.charAt(1));
+                }
+            }
+            else {
+                tempUID[10] = "0";
+                tempUID[11] = "0";
+                patientCounter = 0;
+                if (tempUID[9] != "Z") {
+                    char cTemp1 = tempUID[9].charAt(0);
+                    cTemp1++;
+                    tempUID[9] = String.valueOf(cTemp1);
+                } else if (tempUID[8] != "Z") {
+                    char cTemp1 = tempUID[8].charAt(0);
+                    cTemp1++;
+                    tempUID[8] = String.valueOf(cTemp1);
+                } else {
+                    char cTemp1 = tempUID[7].charAt(0);
+                    cTemp1++;
+                    tempUID[7] = String.valueOf(cTemp1);
+                }
+            }
+        }
+
+        String patientCodeIdentifier = String.join("",tempUID[0],tempUID[1],
+                tempUID[2], tempUID[3], tempUID[4], tempUID[5], tempUID[6],
+                tempUID[7], tempUID[8], tempUID[9], tempUID[10], tempUID[11]);
+
         return patientCodeIdentifier;
     }
 
     public void addNewPatient(){
         Scanner scanner = new Scanner(System.in);
 
-//        String patientCodeIdentifier = generateUID();
-        String patientCodeIdentifier = "ABCDE";
+        String patientCodeIdentifier = generateUID();
         System.out.print("First Name: ");
         String firstName = scanner.nextLine();
         System.out.print("Last Name: ");
@@ -110,14 +129,6 @@ public class ManagePatientRecords {
         String middleName = scanner.nextLine();
         System.out.print("Birthday(YYYYMMDD): ");
         String birthday = scanner.next();
-//        String tempBirthday = scanner.next();
-//        Date birthday= null;
-//        try {
-//            birthday = new SimpleDateFormat("yyyyMMdd").parse(tempBirthday);
-//        } catch (ParseException e) {
-//            System.out.println("Invalid format! Please try again.");
-//            addNewPatient();
-//        }
         System.out.print("Gender: ");
         String gender = scanner.next();
         scanner.nextLine();
@@ -141,14 +152,15 @@ public class ManagePatientRecords {
         }
         long nationalIdNo = temp;
         System.out.print("Save Patient Record?[Y/N]: ");
-        String input = scanner.next();
+        savePatientRecord = scanner.next();
         String yes = "Y";
-        Patient patient = new Patient(patientCodeIdentifier, firstName, lastName, middleName, birthday, gender, address, phoneNo, nationalIdNo);
+        Patient patient = new Patient(patientCodeIdentifier, lastName, firstName, middleName, birthday, gender, address, phoneNo, nationalIdNo);
         patients.add(patient);
 
         System.out.println(patients.size());
 
-        if(Objects.equals(input, yes)) {
+        if(Objects.equals(savePatientRecord, yes)) {
+            patientCounter++;
             String fileName = "Patients.txt";
             error = wtf.writeToFile(fileName, patient, 1);
             if(error == 1)
@@ -185,143 +197,230 @@ public class ManagePatientRecords {
 
     public void searchPatientRecord() {
         Scanner scanner = new Scanner(System.in);
-        String input;
-        System.out.print("Enter patient information to search: ");
-        input = scanner.nextLine();
+        String fileName = "Patients.txt";
 
-        File file = new File("Patients.txt");
+        ReadFile rf = new ReadFile();
+        int error = rf.readFile(fileName, 1, 0);
+        String[][] patients = rf.getTempSearch();
+        if(error==1)
+            searchPatientRecord();
 
-        if(input.length() == 12) {
-            // try catch while to scan txt file for Patient's UID or National ID No. 0, 8
-            try {
-                Scanner scannerFile = new Scanner(file);
+        int searched = 0;
 
-                while (scanner.hasNextLine()) {
-                    String temp = scanner.nextLine();
-                    String[] line = temp.split(";");
-                    if(line[0] == input || line[8] == input) {
-                        char check = line[9].charAt(0); //check if file is deleted
-                        if (check == 'D')
-                            continue;
-                        else {
-                            // display record
-                            break;                  //not sure what happens here
+        System.out.print("Do you know the patient's UID?[Y/N]: ");
+        String input = scanner.next();
+        if(input == "Y") {                                                            // UID
+            System.out.print("Enter patient's UID: ");
+            String searchUID = scanner.next();
+            for(int i=0; i<patients.length; i++) {
+                if(patients[i][0] == searchUID) {
+                    searched = 1;
+                    int line = i;
+                    break;
+                }
+            }
+        } else {
+            System.out.print("Do you know the patient's National ID no.?[Y/N]: ");  // National ID
+            input = scanner.next();
+            if(input == "Y") {
+                System.out.print("Enter patient's National ID no.: ");
+                String searchID = scanner.next();
+                for(int i=0; i<patients.length; i++) {
+                    if(patients[i][8] == searchID) {
+                        searched = 1;
+                        int line = i;
+                        break;
+                    }
+                }
+            } else {
+                scanner.nextLine();
+                System.out.print("Enter patient's Last name: ");                    // f, l, birthday combi 1,2,4
+                String searchLast = scanner.nextLine();
+                System.out.print("Enter patient's First name: ");
+                String searchFirst = scanner.nextLine();
+                System.out.print("Enter patient's Birthday(YYYYMMDD): ");
+                String searchBirthday = scanner.next();
+                int[] lines = new int[256];
+                for(int i=0; i<patients.length; i++) {
+                    if(patients[i][1]==searchLast && patients[i][2]==searchFirst && patients[i][4]==searchBirthday) {
+                        lines[searched] = i;
+                        searched++;
+                    }
+                }
+                if(lines.length>1) {
+                    System.out.println("Patient's UID \tLast Name \tFirst Name \tMiddle Name \tBirthday \tGender\t Address \tPhone Number \tNational ID. No");
+                    for(int i =0; i<lines.length; i++) {
+                        for(int j=0; j<9; j++) {
+                            System.out.print(patients[i][j] + " \t");
+                        }
+                        System.out.println();
+                    }
+                    System.out.print("Enter the patient's UID you want to display: ");
+                    input = scanner.next();
+                    searched = 0;
+                    for(int i=0; i<patients.length; i++) {
+                        if(patients[i][0] == input) {
+                            searched = 1;
+                            int line = i;
+                            break;
                         }
                     }
                 }
-            } catch (FileNotFoundException e) {
-                System.out.println("No record found.");
-                System.out.println("Would you like to search again or return to the main menu?");
-                System.out.println("[1] Search again");
-                System.out.println("[2] Return to the Main Menu");
-                System.out.print("Select a transaction: ");
-                int ans = scanner.nextInt();
-                System.out.println();
-                if(ans == 1)
-                    searchPatientRecord();
-                else
-                    mm.mainMenu();
+                else {
+                    int line = lines[0];
+                }
             }
         }
+        if(searched==0) {
+            System.out.println("No record found.");
+            System.out.println("Would you like to search again or return to the main menu?");
+            System.out.println("[1] Search for another patient record");
+            System.out.println("[2] Return to the Main Menu");
+            System.out.print("Select a transaction: ");
+            int ans = scanner.nextInt();
+            System.out.println();
+            if(ans == 1)
+                searchPatientRecord();
+            else
+                mm.mainMenu();
+        }
         else {
-            String[] inputSplit = input.split("\\s");
-            int lineNos[] = null; //store line numbers
+            System.out.println("Request's UID \t\tLab Test Type \t\tRequest Date \t\tResult");
+            //print from manage laboratory request
+            //print from manage service request
+            System.out.println("Do you want to print a laboratory test result? [Y/N]");
+            input = scanner.next();
+            if(input == "Y") {
+                System.out.print("Enter Request's UID: ");
+                String reqUID = scanner.next();
 
-            // try catch while to scan txt file for last name, first name, birthday combination 1,2,4
-            try {
-                Scanner scannerFile = new Scanner(file);
-                int lineNo = 0;
-                int i = 0;
-
-                while (scanner.hasNextLine()) {
-                    String temp = scanner.nextLine();
-                    String[] line = temp.split(";");
-
-                    if ((inputSplit[0] == line[1]) && (inputSplit[1] == line[2]) && (inputSplit[2] == line[4])) {
-                        char check = line[9].charAt(0); //check if file is deleted
-                        if (check == 'D')
-                            continue;
-                        else {
-                            lineNos[i] = lineNo;
-                            i++;
-                        }
-                    }
-                    lineNo++;
-                }
-
-                if(!scanner.hasNextLine()) {
-                    if(lineNos.length > 1) {
-                        System.out.println("Patient's UID \tLast Name \tFirst Name \tMiddle Name \tBirthday \tGender\t Address \tPhone Number \tNational ID. No");
-                        for (int j = 0; j < lineNos.length; j++) {
-                            System.out.println("%s \t%s \t%s \t%s \t%s \t%c\t %s \t%d \t%d");
-                        }
-                        System.out.println("\nEnter the patient's UID that you want to display: ");
-                        String input1 = scanner.next();
-                        try {
-                            scannerFile = new Scanner(file);
-
-                            while (scanner.hasNextLine()) {
-                                String temp = scanner.nextLine();
-                                String[] line = temp.split(";");
-                                if(line[0] == input1) {
-                                    char check = line[9].charAt(0); //check if file is deleted
-                                    if (check == 'D')
-                                        continue;
-                                    else {
-                                        // display record
-                                        break;                  //not sure what happens here
-                                    }
-                                }
-                            }
-                        } catch (FileNotFoundException e) {
-                            System.out.println("No record found.");
-                            System.out.println("Would you like to search again or return to the main menu?");
-                            System.out.println("[1] Search again");
-                            System.out.println("[2] Return to the Main Menu");
-                            System.out.print("Select a transaction: ");
-                            int ans = scanner.nextInt();
-                            System.out.println();
-                            if(ans == 1)
-                                searchPatientRecord();
-                            else
-                                mm.mainMenu();
-                        }
-                    }
-                    else {
-                        //display record
-                    }
-                }
-            } catch (FileNotFoundException e) {
-                System.out.println("No record found.");
-                System.out.println("Would you like to search again or return to the main menu?");
-                System.out.println("[1] Search again");
-                System.out.println("[2] Return to the Main Menu");
-                System.out.print("Select a transaction: ");
-                int ans = scanner.nextInt();
-                System.out.println();
-                if(ans == 1)
-                    searchPatientRecord();
-                else
-                    mm.mainMenu();
+                //print laboratory request
+            } else {
+                mm.mainMenu();
             }
         }
     }
 
     public void deletePatientRecord() {
-        //ReadFile
+        Scanner scanner = new Scanner(System.in);
+        String fileName = "Patients.txt";
+
+        ReadFile rf = new ReadFile();
+        int error = rf.readFile(fileName, 1, 0);
+        String[][] patients = rf.getTempSearch();
+        if(error==1)
+            searchPatientRecord();
+
+        int searched = 0;
+        int line = 0;
+        System.out.print("Do you know the patient's UID?[Y/N]: ");
+        String input = scanner.next();
+        if(input == "Y") {                                                            // UID
+            System.out.print("Enter patient's UID: ");
+            String searchUID = scanner.next();
+            for(int i=0; i<patients.length; i++) {
+                if(patients[i][0] == searchUID) {
+                    searched = 1;
+                    line = i;
+                    break;
+                }
+            }
+        } else {
+            System.out.print("Do you know the patient's National ID no.?[Y/N]: ");  // National ID
+            input = scanner.next();
+            if(input == "Y") {
+                System.out.print("Enter patient's National ID no.: ");
+                String searchID = scanner.next();
+                for(int i=0; i<patients.length; i++) {
+                    if(patients[i][8] == searchID) {
+                        searched = 1;
+                        line = i;
+                        break;
+                    }
+                }
+            } else {
+                scanner.nextLine();
+                System.out.print("Enter patient's Last name: ");                    // f, l, birthday combi 1,2,4
+                String searchLast = scanner.nextLine();
+                System.out.print("Enter patient's First name: ");
+                String searchFirst = scanner.nextLine();
+                System.out.print("Enter patient's Birthday(YYYYMMDD): ");
+                String searchBirthday = scanner.next();
+                int[] lines = new int[256];
+                for(int i=0; i<patients.length; i++) {
+                    if(patients[i][1]==searchLast && patients[i][2]==searchFirst && patients[i][4]==searchBirthday) {
+                        lines[searched] = i;
+                        searched++;
+                    }
+                }
+                if(lines.length>1) {
+                    System.out.println("Patient's UID \tLast Name \tFirst Name \tMiddle Name \tBirthday \tGender\t Address \tPhone Number \tNational ID. No");
+                    for(int i =0; i<lines.length; i++) {
+                        for(int j=0; j<9; j++) {
+                            System.out.print(patients[i][j] + " \t");
+                        }
+                        System.out.println();
+                    }
+                    System.out.print("Enter the patient's UID you want to display: ");
+                    input = scanner.next();
+                    searched = 0;
+                    for(int i=0; i<patients.length; i++) {
+                        if(patients[i][0] == input) {
+                            searched = 1;
+                            line = i;
+                            break;
+                        }
+                    }
+                } else {
+                    line = lines[0];
+                }
+            }
+        }
+        //check if a record was found
+        if(searched==0) {
+            System.out.println("No record found.");
+            System.out.println("Would you like to search again or return to the main menu?");
+            System.out.println("[1] Search for another patient record");
+            System.out.println("[2] Return to the Main Menu");
+            System.out.print("Select a transaction: ");
+            int ans = scanner.nextInt();
+            System.out.println();
+            if(ans == 1)
+                deletePatientRecord();
+            else
+                mm.mainMenu();
+        } else {
+            scanner.nextLine();
+            System.out.println("Please state reason for deletion: ");
+            reason = scanner.nextLine();
+            String D = "D;";
+            newLine = String.join("", D, reason);
+            error = rf.readFile(fileName, 2, line);
+            if(error == 1)
+                deletePatientRecord();
+            System.out.println();
+            System.out.println("Would you like to delete another patient record? [Y/N]: ");
+            String ans = scanner.next();
+            System.out.println();
+            if(ans == "Y")
+                deletePatientRecord();
+            else
+                mm.mainMenu();
+        }
     }
 
     public void editPatientRecord() {
         //ReadFile
     }
 
+
     public ArrayList<Patient> getPatients()    {
         return patients;
     }
 
-//    public int writeToFile(String fileName, Patient patient) {
-//        return error;
-//    }
+    public String getNewLine() {
+        return newLine;
+    }
 
 }
 

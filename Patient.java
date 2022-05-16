@@ -1,7 +1,7 @@
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Patient { //CHANGE TO Patient
+public class Patient {
     String pattern = "yyyy/MM/dd";
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 
@@ -9,17 +9,16 @@ public class Patient { //CHANGE TO Patient
     private String firstName;
     private String lastName;
     private String middleName;
-//    private Date birthday = new Date();
     private String birthday = simpleDateFormat.format(new Date());
     private String gender;
     private String address;
     private long phoneNo;
     private long nationalIdNo;
 
-    public Patient(String patientCodeIdentifier, String firstName, String lastName, String middleName, String birthday, String gender, String address, long phoneNo, long nationalIdNo) {
+    public Patient(String patientCodeIdentifier, String lastName, String firstName, String middleName, String birthday, String gender, String address, long phoneNo, long nationalIdNo) {
         this.patientCodeIdentifier = patientCodeIdentifier;
-        this.firstName = firstName;
         this.lastName = lastName;
+        this.firstName = firstName;
         this.middleName = middleName;
         this.birthday = birthday;
         this.gender = gender;
