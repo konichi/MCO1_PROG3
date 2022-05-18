@@ -1,68 +1,85 @@
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Scanner;
-import java.util.stream.Stream;
 
 public class ReadFile {
     String[][] tempSearch = new String[256][11];
-    String tempLine = new String();
+    String UID;
 
-    ManagePatientRecords mpr = new ManagePatientRecords();
-    String newLine = mpr.getNewLine();
-
-    public int readFile(String fileName, int type, int line) {
+    //getting all lines from text file
+    public int readFile(String fileName) {
         int error;
-        BufferedReader br = null;
         int counter = 0;
 
         try {
             File file = new File(fileName);
             Scanner scannerFile = new Scanner(file);
 
-                switch (type) {
-                    case 1:                 //search
-                        while(scannerFile.hasNextLine()) {
-                            String temp = scannerFile.nextLine();
-                            String[] tempLine = temp.split(";");
-                            if (tempLine[9] == "D")
-                                continue;
-                            else {
-                                for (int i = counter; i < counter + 1; i++) {
-                                    for (int j = 0; j < 11; i++) {
-                                        tempSearch[i][j] = tempLine[j];
-                                    }
-                                }
-                                counter++;
-                            }
-                        }
-                        break;
-                    case 2:                 //append delete
-                        tempLine = Files.readAllLines(Paths.get(fileName)).get(line);
-                        String[] splitLine = tempLine.split(";");
-                        String UID = splitLine[0];
-                        FileWriter fw = new FileWriter(file.getName(),true);
-                        BufferedWriter bw = new BufferedWriter(fw);
-                        int lineCount = 0;
-                        while (lineCount<line)
-                            lineCount++;
-                        bw.write(newLine+";");
-
-                        System.out.println("Data of patient "+UID+" has been deleted.");
-                        break;
+            while(scannerFile.hasNextLine()) {
+                String temp = scannerFile.nextLine();
+                String[] tempLine = temp.split(";");
+                if (11!=tempLine.length) {
+                    for (int i = counter; i < counter + 1; i++) {
+                        for (int j = 0; j < 9; j++)
+                            tempSearch[i][j] = tempLine[j];
+                    }
                 }
+                counter++;
+            }
+
             error = 0;
-        } catch (FileNotFoundException e) {
-            System.out.println("Error occurred. Please try again");
-            error = 1;
-        } catch (IOException io) {
+        } catch (IOException e) {
             System.out.println("Error occurred. Please try again");
             error = 1;
         }
         return error;
     }
 
+    //reading UID for UID generation
+    public int readUID(String fileName) {
+        int isFirst;
+        String line;
+        String temp = null;
+        try {
+            FileReader file = new FileReader(fileName);
+            BufferedReader buffer = new BufferedReader(file);
+
+            while((line = buffer.readLine())!=null) {
+                temp = line;
+            }
+            String[] split = temp.split(";");
+            UID = split[0];
+
+            isFirst = 0;
+        } catch (IOException | NullPointerException e) {
+            isFirst = 1;
+        }
+        return isFirst;
+    }
+
+    //reading patient's UID if it exists
+    public int checkUID(String fileName, String UID) {
+        int exists = 0;
+        try {
+            File file = new File(fileName);
+            Scanner scannerFile = new Scanner(file);
+
+            while(scannerFile.hasNextLine()) {
+                String temp = scannerFile.nextLine();
+                String[] tempLine = temp.split(";");
+                if (tempLine[0].equalsIgnoreCase(UID)) {
+                    return 1;
+                }
+            }
+        } catch (IOException | NullPointerException ignored) {}
+        return exists;
+    }
+
     public String[][] getTempSearch() {
         return tempSearch.clone();
     }
+
+    public String getUID() {
+        return UID;
+    }
+
 }

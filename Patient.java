@@ -1,21 +1,15 @@
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public class Patient {
-    String pattern = "yyyy/MM/dd";
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-
     private String patientCodeIdentifier;
     private String firstName;
     private String lastName;
     private String middleName;
-    private String birthday = simpleDateFormat.format(new Date());
+    private String birthday;
     private String gender;
     private String address;
-    private long phoneNo;
+    private String phoneNo;
     private long nationalIdNo;
 
-    public Patient(String patientCodeIdentifier, String lastName, String firstName, String middleName, String birthday, String gender, String address, long phoneNo, long nationalIdNo) {
+    public Patient(String patientCodeIdentifier, String lastName, String firstName, String middleName, String birthday, String gender, String address, String phoneNo, long nationalIdNo) {
         this.patientCodeIdentifier = patientCodeIdentifier;
         this.lastName = lastName;
         this.firstName = firstName;
@@ -84,11 +78,11 @@ public class Patient {
         this.address = address;
     }
 
-    public long getPhoneNo() {
+    public String getPhoneNo() {
         return phoneNo;
     }
 
-    public void setPhoneNo(int phoneNo) {
+    public void setPhoneNo(String phoneNo) {
         this.phoneNo = phoneNo;
     }
 

@@ -17,6 +17,7 @@ public class MainMenu {
             case "1" -> managePatientRecords();
             case "2" -> manageServices();
             case "3" -> manageLaboratoryRequest();
+            default -> mainMenu();
         }
     }
 
