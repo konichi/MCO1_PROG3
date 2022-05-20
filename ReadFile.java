@@ -5,8 +5,8 @@ public class ReadFile {
     String[][] tempSearch = new String[256][11];
     String UID;
 
-    //getting all lines from text file
-    public int readFile(String fileName) {
+    //getting all lines from patients file
+    public int readPatients(String fileName) {
         int error;
         int counter = 0;
 
@@ -17,10 +17,17 @@ public class ReadFile {
             while(scannerFile.hasNextLine()) {
                 String temp = scannerFile.nextLine();
                 String[] tempLine = temp.split(";");
-                if (11!=tempLine.length) {
-                    for (int i = counter; i < counter + 1; i++) {
+
+                for (int i = counter; i < counter + 1; i++) {
+                    if (tempLine.length <= 9) {
                         for (int j = 0; j < 9; j++)
-                            tempSearch[i][j] = tempLine[j];
+                            if (tempLine[j] != null)
+                                tempSearch[i][j] = tempLine[j];
+                    } else if (tempLine.length == 11) {
+                        for (int j = 0; j < 11; j++)
+                            if (tempLine[j] != null) {
+                                tempSearch[i][j] = tempLine[j];
+                            }
                     }
                 }
                 counter++;
@@ -34,7 +41,78 @@ public class ReadFile {
         return error;
     }
 
-    //reading UID for UID generation
+    //getting all lines from services file
+    public int readServices(String fileName) {
+        int error;
+        int counter = 0;
+
+        try {
+            File file = new File(fileName);
+            Scanner scannerFile = new Scanner(file);
+
+            while(scannerFile.hasNextLine()) {
+                String temp = scannerFile.nextLine();
+                String[] tempLine = temp.split(";");
+                for (int i = counter; i < counter + 1; i++) {
+                    if (tempLine.length <= 3) {
+                        for (int j = 0; j < 3; j++)
+                            if (tempLine[j] != null)
+                                tempSearch[i][j] = tempLine[j];
+                    } else if (tempLine.length == 5) {
+                        for (int j = 0; j < 5; j++)
+                            if (tempLine[j] != null) {
+                                tempSearch[i][j] = tempLine[j];
+                            }
+                    }
+                }
+                counter++;
+            }
+
+            error = 0;
+        } catch (IOException e) {
+            System.out.println("Error occurred. Please try again");
+            error = 1;
+        }
+        return error;
+    }
+
+    //getting all lines from requests file
+    public int readRequests(String fileName) {
+        int error;
+        int counter = 0;
+
+        try {
+            File file = new File(fileName);
+            Scanner scannerFile = new Scanner(file);
+
+            while(scannerFile.hasNextLine()) {
+                String temp = scannerFile.nextLine();
+                String[] tempLine = temp.split(";");
+                for (int i = counter; i < counter + 1; i++) {
+                    if (tempLine.length <= 5) {
+                        for (int j = 0; j < 5; j++)
+                            if (tempLine[j] != null)
+                                tempSearch[i][j] = tempLine[j];
+                    } else if (tempLine.length == 7) {
+                        for (int j = 0; j < 7; j++)
+                            if (tempLine[j] != null) {
+                                tempSearch[i][j] = tempLine[j];
+                            }
+                    }
+                }
+                counter++;
+            }
+
+            error = 0;
+        } catch (FileNotFoundException e) {
+            System.out.println("Error occurred. Please try again");
+            error = 1;
+        }
+
+        return error;
+    }
+
+    //reading UID for generateUID
     public int readUID(String fileName) {
         int isFirst;
         String line;
@@ -56,7 +134,7 @@ public class ReadFile {
         return isFirst;
     }
 
-    //reading patient's UID if it exists
+    // checks patient's UID if it exists - Laboratory Requests
     public int checkUID(String fileName, String UID) {
         int exists = 0;
         try {
@@ -66,7 +144,25 @@ public class ReadFile {
             while(scannerFile.hasNextLine()) {
                 String temp = scannerFile.nextLine();
                 String[] tempLine = temp.split(";");
-                if (tempLine[0].equalsIgnoreCase(UID)) {
+                if (tempLine[0].equalsIgnoreCase(UID) && tempLine.length<10) {
+                    return 1;
+                }
+            }
+        } catch (IOException | NullPointerException ignored) {}
+        return exists;
+    }
+
+    // checks if service code exists - manage services
+    public int checkCode(String fileName, String code) {
+        int exists = 0;
+        try {
+            File file = new File(fileName);
+            Scanner scannerFile = new Scanner(file);
+
+            while(scannerFile.hasNextLine()) {
+                String temp = scannerFile.nextLine();
+                String[] tempLine = temp.split(";");
+                if (tempLine[0].equalsIgnoreCase(code) && tempLine.length<4) {
                     return 1;
                 }
             }
