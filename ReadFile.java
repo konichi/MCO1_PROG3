@@ -80,9 +80,12 @@ public class ReadFile {
     public int readRequests(String fileName) {
         int error;
         int counter = 0;
-
         try {
             File file = new File(fileName);
+            boolean exists = file.exists();
+            if(!exists)
+                return -1;
+
             Scanner scannerFile = new Scanner(file);
 
             while(scannerFile.hasNextLine()) {
@@ -104,9 +107,8 @@ public class ReadFile {
             }
 
             error = 0;
-        } catch (FileNotFoundException e) {
-            System.out.println("Error occurred. Please try again");
-            error = 1;
+        } catch (FileNotFoundException | NullPointerException e) {
+            return 0;
         }
 
         return error;

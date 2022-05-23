@@ -32,6 +32,28 @@ public class WriteToFile {
         return error;
     }
 
+    public int writeToServices(String fileName, Service service) {
+        int error;
+
+        try {
+            File file = new File(fileName);
+            FileWriter fw = new FileWriter(file.getName(),true);
+            BufferedWriter bw = new BufferedWriter(fw);
+
+            bw.write(service.getServiceCode() + ";");
+            bw.write(service.getDescription() + ";");
+            bw.write(service.getPrice() + ";");
+            bw.newLine();
+
+            bw.close();
+            error = 0;
+        } catch(IOException e){
+            System.out.println("Error occurred. Please try again");
+            error = 1;
+        }
+        return error;
+    }
+
     // adding laboratory requests
     public int writeToLabRequests(String fileName, Request request) {
         int error;
@@ -45,6 +67,7 @@ public class WriteToFile {
             bw.write(request.getPatientUID() + ";");
             bw.write(request.getRequestDate() + ";");
             bw.write(request.getRequestTime() + ";");
+            bw.write(request.getResult() + ";");
             bw.newLine();
 
             bw.close();

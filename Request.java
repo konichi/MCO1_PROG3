@@ -1,11 +1,11 @@
 public class Request {
     private String requestUID;
     private String patientUID;
-    private int requestDate;
+    private String requestDate;
     private String requestTime;
     private String result;
 
-    public Request(String requestUID, String patientUID, int requestDate, String requestTime, String result) {
+    public Request(String requestUID, String patientUID, String requestDate, String requestTime, String result) {
         this.requestUID = requestUID;
         this.patientUID = patientUID;
         this.requestDate = requestDate;
@@ -29,11 +29,11 @@ public class Request {
         this.patientUID = patientUID;
     }
 
-    public int getRequestDate() {
+    public String getRequestDate() {
         return requestDate;
     }
 
-    public void setRequestDate(int requestDate) {
+    public void setRequestDate(String requestDate) {
         this.requestDate = requestDate;
     }
 
